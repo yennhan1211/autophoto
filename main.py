@@ -4,8 +4,8 @@ import time
 
 import logging
 
-from camera import *
-from upload import *
+from camera import Camera
+from upload import Upload
 
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -23,11 +23,11 @@ def main():
 
     logging.info ('Initializing Camera Module...')
 
-    myCam = Camera('Camera', imgStoreQueue)
+    myCam = Camera('Camera', imgStoreQueue, smsQueue)
 
     logging.info ('Initializing Upload Module...')
 
-    myUpload = Upload('Upload', imgStoreQueue)
+    myUpload = Upload('Upload', imgStoreQueue, smsQueue)
 
     logging.info ('Initializing SMS Module...')
 
