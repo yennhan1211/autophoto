@@ -1,7 +1,7 @@
 import httplib2
 import os
 import threading
-import Queue
+# import Queue
 import time
 
 import logging
@@ -14,11 +14,16 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+    flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/drive-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/drive.file'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = 'client_secrets.json'
 APPLICATION_NAME = 'Img upload'
 
 class Upload(threading.Thread):
@@ -33,7 +38,7 @@ class Upload(threading.Thread):
         while not self.stoprequest.isSet():
             try:
                 filePath = self.mQueue.get(True, 0.05)
-                logging.info(filePath)
+                logging.info('Uploading file at: ' + filePath)
             except Queue.Empty:
                 continue
 
@@ -56,11 +61,8 @@ def get_credentials():
     Returns:
         Credentials, the obtained credential.
     """
-    home_dir = os.path.expanduser('~')
-    credential_dir = os.path.join(home_dir, '.credentials')
-    if not os.path.exists(credential_dir):
-        os.makedirs(credential_dir)
-    credential_path = os.path.join(credential_dir,
+    home_dir = os.getcwd()
+    credential_path = os.path.join(home_dir,
                                    'credential.json')
 
     store = Storage(credential_path)
@@ -68,6 +70,7 @@ def get_credentials():
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
+        flags.noauth_local_webserver = True
         credentials = tools.run_flow(flow, store, flags)
         print('Storing credentials to ' + credential_path)
     return credentials
@@ -104,6 +107,12 @@ def insert_file(service, title, description, parent_id, mime_type, filename):
         # print 'File ID: %s' % file['id']
 
         return file
-    except errors.HttpError, error:
-        print 'An error occurred: %s' % error
+    except errors.HttpError as error:
+        print ('An error occurred: %s' % error)
         return None
+
+if __name__ == '__main__':
+    credentials = get_credentials()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('drive', 'v2', http=http)
+    insert_file(service, 'anh1.jpg', 'mota1', None, 'image/jpeg', '/home/pi/20170723-033423.jpg')

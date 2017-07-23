@@ -1,7 +1,7 @@
 import os
 import sys
 import time
-
+import Queue
 import logging
 
 from camera import Camera
@@ -13,7 +13,7 @@ formatter = logging.Formatter(
         '%(asctime)s %(levelname)-8s %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 def main():
@@ -24,6 +24,7 @@ def main():
     logging.info ('Initializing Camera Module...')
 
     myCam = Camera('Camera', imgStoreQueue, smsQueue)
+    myCam.setSaveLocation('/home/pi')
 
     logging.info ('Initializing Upload Module...')
 
@@ -42,8 +43,6 @@ def main():
             myCam.join()
             myUpload.join()
             break
-        else:
-            myCam.doCapture()
 
 
 if __name__ == '__main__':
