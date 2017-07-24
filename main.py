@@ -37,12 +37,21 @@ def main():
     myCam.start()
     myUpload.start()
 
-    while True:
-        strInput = raw_input()
-        if strInput == 'exit':
+    try:
+        while True:
+            strInput = raw_input()
+            if strInput == 'exit':
+                if myCam.isAlive():
+                    myCam.join()
+                if myUpload.isAlive():
+                    myUpload.join()
+                break
+    except KeyboardInterrupt as e:
+        logging.info("Stopping...")
+        if myCam.isAlive():
             myCam.join()
+        if myUpload.isAlive():
             myUpload.join()
-            break
 
 
 if __name__ == '__main__':

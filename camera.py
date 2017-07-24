@@ -15,6 +15,7 @@ FILENAME        = "--filename"
 FILEPATH        = "%Y%m%d-%H%M%S.jpg"
 
 PROCESS_FOLDER  = "imgStore"
+META_FILE       = "meta.txt"
 
 class Camera(threading.Thread):
     """docstring for Camera"""
@@ -39,14 +40,23 @@ class Camera(threading.Thread):
     def run(self):
         os.chdir(self.defaultPath)
 
-        processFolderPath = os.path.join(defautPath, PROCESS_FOLDER)
+        metaFilePath = os.path.join(self.defaultPath, META_FILE )
+        processFolderPath = os.path.join(self.defaultPath, PROCESS_FOLDER)
+
+        fileUploaded = []
+
+        if os.path.exists(metaFilePath):
+            fileUploaded = open(metaFilePath, 'rb').readlines()
 
         if not os.path.exists(processFolderPath):
             logging.info ('Create folder')
             os.makedirs(processFolderPath)
 
         for root, dirs, files in os.walk(PROCESS_FOLDER):
-            pass
+            for filename in files:
+                tmpPath = os.path.join(root, filename)
+                if tmpPath not in fileUploaded:
+                    self.mImgQueue.put(tmpPath)
 
         while not self.stoprequest.isSet():
             if self.doCheckCamera():
@@ -93,9 +103,11 @@ class Camera(threading.Thread):
             result = out.strip().split('\n')
             if len(result) > 2:
                 retVal = True
-                logging.info('Found cameras:')
+                logging.info('Found camera:')
                 for s in result[2:]:
                     logging.info(s)
+            else:
+                logging.info('Camera not found')
 
         return retVal
 

@@ -1,7 +1,7 @@
 import httplib2
 import os
 import threading
-# import Queue
+import Queue
 import time
 
 import logging
@@ -52,6 +52,8 @@ class Upload(threading.Thread):
     def doResume(self):
         logging.info('Resume upload file ')
 
+
+
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -72,7 +74,7 @@ def get_credentials():
         flow.user_agent = APPLICATION_NAME
         flags.noauth_local_webserver = True
         credentials = tools.run_flow(flow, store, flags)
-        print('Storing credentials to ' + credential_path)
+        logging.info('Storing credentials to ' + credential_path)
     return credentials
 
 def insert_file(service, title, description, parent_id, mime_type, filename):
@@ -108,7 +110,7 @@ def insert_file(service, title, description, parent_id, mime_type, filename):
 
         return file
     except errors.HttpError as error:
-        print ('An error occurred: %s' % error)
+        logging.info ('An error occurred: %s' % error)
         return None
 
 if __name__ == '__main__':

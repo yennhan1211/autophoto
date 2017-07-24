@@ -6,13 +6,18 @@ os.chdir(defautPath)
 
 processFolderPath = os.path.join(defautPath, 'imgFolder')
 
-if not os.path.exists(processFolderPath):
-    print ('Create folder')
-    os.makedirs(processFolderPath)
+metaPath = os.path.join(defautPath, 'meta.txt')
 
-for root, dirs, files in os.walk('imgFolder'):
-    for filename in files:
-        print (filename)
-    print (root)
+if not os.path.exists(metaPath):
+    open(metaPath, 'a').close()
+
+# if not os.path.exists(processFolderPath):
+#     print ('Create folder')
+#     os.makedirs(processFolderPath)
+
+# for root, dirs, files in os.walk('imgFolder'):
+#     for filename in files:
+#         print (filename)
+#     print (root)
 
 # print (processFolderPath)
